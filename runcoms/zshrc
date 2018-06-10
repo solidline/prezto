@@ -10,4 +10,73 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-# Customize to your needs...
+BASE16_SHELL=$HOME/.config/base16-shell/
+[ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
+
+
+# 
+# From brew install: 
+# Add the following to your zshrc to access the online help:
+
+autoload -U compinit && compinit
+
+fpath=( "/usr/local/share/zsh/site-functions" $fpath )
+
+autoload -U promptinit && promptinit
+
+prompt pure
+
+#unalias run-help
+#autoload run-help
+#HELPDIR=/opt/boxen/homebrew/share/zsh/help
+
+# boost the maven memory, useful for when running  jetty
+export MAVEN_OPTS="-Duser.timezone=UTC -XX:MaxPermSize=1G -Xss4m -Xss5024k"
+# needed so maven uses the corrent java version.
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home
+
+# local bin
+# export PATH=$HOME/.fastlane/bin:$PATH:/Users/tsanden/Library/Python/2.7/bin:/Users/tsanden/code/dynamodump:/Users/tsanden/.gem/ruby/2.4.0/bin:$ANDROID_HOME/bin:$GOPATH/bin:/usr/local/bin
+
+export PATH="/usr/local/bin:$PATH"
+
+# powerline support
+export PATH="/Users/tsanden/Library/Python/2.7/bin:$PATH"
+export POWERLINE_CONFIG_COMMAND="/Users/tsanden/Library/Python/2.7/bin/powerline-config"
+
+export GOPATH=$HOME/go
+
+# flutter
+export FLUTTER=/usr/local/share/flutter/bin
+# export PATH=$PATH:$FLUTTER
+
+# go
+# export PATH=$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin
+
+export ANDROID_HOME=/usr/local/opt/android-sdk
+export ANDROID_NDK_HOME=/usr/local/opt/android-ndk
+
+
+. ~/.bin/z/z.sh
+
+source $HOME/.zsh/aliases
+source $HOME/.zsh/zsh_aliases
+source $HOME/.zprivate
+
+
+export EDITOR="nvim"
+export VISUAL="nvim"
+
+randline () {
+  # FILE='filename.txt'
+  let "n=${RANDOM}%$(wc -l < $1)"
+  head -n $n $1 | tail -1
+}
+
+
+clear
+
+alias prettyjson='python -m json.tool'
+java8 > /dev/null 2>&1
+
+alias v=nvim
