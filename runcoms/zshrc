@@ -31,8 +31,27 @@ prompt pure
 
 # boost the maven memory, useful for when running  jetty
 export MAVEN_OPTS="-Duser.timezone=UTC -XX:MaxPermSize=1G -Xss4m -Xss5024k"
+
+# List java versions
+#
+# /usr/libexec/java_home -V
 # needed so maven uses the corrent java version.
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home
+# export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home
+
+# export JAVA_8_HOME=$(/usr/libexec/java_home -v1.8)
+# export JAVA_9_HOME=$(/usr/libexec/java_home -v9)
+# export JAVA_10_HOME=$(/usr/libexec/java_home -v10)
+export JAVA_11_HOME=$(/usr/libexec/java_home -v11)
+# 
+# alias java8='export JAVA_HOME=$JAVA_8_HOME'
+# alias java9='export JAVA_HOME=$JAVA_9_HOME'
+# alias java10='export JAVA_HOME=$JAVA_10_HOME'
+alias java11='export JAVA_HOME=$JAVA_11_HOME'
+alias cat='bat --theme=base16'
+
+# default to Java 11
+java11
+# export JAVA_HOME=$(/usr/libexec/java_home -v11.0.2)
 
 # local bin
 # export PATH=$HOME/.fastlane/bin:$PATH:/Users/tsanden/Library/Python/2.7/bin:/Users/tsanden/code/dynamodump:/Users/tsanden/.gem/ruby/2.4.0/bin:$ANDROID_HOME/bin:$GOPATH/bin:/usr/local/bin
@@ -52,8 +71,29 @@ export FLUTTER=/usr/local/share/flutter/bin
 # go
 # export PATH=$PATH:/usr/local/opt/go/libexec/bin:$GOPATH/bin
 
+# gem
+export PATH="/usr/local/opt/ruby/bin:/usr/local/lib/ruby/gems/2.6.0/bin:$PATH"
+
 export ANDROID_HOME=/usr/local/opt/android-sdk
 export ANDROID_NDK_HOME=/usr/local/opt/android-ndk
+
+export FZF_DEFAULT_OPTS=--color=16
+
+# show colors with cheat results
+export CHEAT_COLORS=true
+export CHEAT_COLORSCHEME=dark
+export CHEAT_PATH='/usr/local/opt/cheat/libexec/lib/python3.7/site-packages/cheat/cheatsheets'
+export CHEAT_PATH="$CHEAT_PATH:~/.cheat"
+
+# FZF Options
+export FZF_DEFAULT_OPTS='-m --bind ctrl-a:select-all,ctrl-d:deselect-all,ctrl-t:toggle-all'
+
+# vim base-16 fix to use gnu-sed
+PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
+
+# xls diff
+PATH="/Users/tsanden/code/xlsx2txt/bin:$PATH"
+
 
 
 . ~/.bin/z/z.sh
@@ -66,10 +106,37 @@ source $HOME/.zprivate
 export EDITOR="nvim"
 export VISUAL="nvim"
 
+[ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
+
 randline () {
   # FILE='filename.txt'
   let "n=${RANDOM}%$(wc -l < $1)"
   head -n $n $1 | tail -1
+}
+
+fe() {
+  local files
+  IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
+  [[ -n "$files" ]] && ${EDITOR:-vim} "${files[@]}"
+}
+
+# fd - cd to selected directory
+fd() {
+  local dir
+  dir=$(find ${1:-.} -path '*/\.*' -prune \
+                  -o -type d -print 2> /dev/null | fzf +m) &&
+  cd "$dir"
+}
+
+unalias z
+
+z() {
+  if [[ -z "$*" ]]; then
+    cd "$(_z -l 2>&1 | fzf +s --tac | sed 's/^[0-9,.]* *//')"
+  else
+    _last_z_args="$@"
+    _z "$@"
+  fi
 }
 
 
